@@ -34,8 +34,9 @@ boot.ns <- function(fit, rchild, N, prog = TRUE){
         args$sigma.sv <- pars["sigma"]
         args$child.dist$sv <- pars["child.par"]
         args$trace <- FALSE
-        fit.boot <- do.call("fit.ns", args)
-        boots[i, ] <- coef(fit.boot)
+        fit.boot <- tryCatch(do.call("fit.ns", args),error=function(e) e)
+        if(inherits(fit.boot,"error")) next
+        boots[i, ] <- fit.boot$pars
         ## Updating progress bar.
         if (prog){
             setTxtProgressBar(pb, i)
