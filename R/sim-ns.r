@@ -39,7 +39,7 @@
 #' @param ... Further parameters for rchild.dist.
 #' 
 #' @export
-sim.ns <- function(pars = NULL, lims = rbind(c(0, 1), c(0, 1)), rchild = rpois, non.siblings = NULL, plot.points = FALSE, plot.empirical = FALSE){
+sim.ns <- function(pars = NULL, lims = rbind(c(0, 1), c(0, 1)), rchild = rpois, non.siblings = NULL, plot.points = FALSE,axis=FALSE, plot.empirical = FALSE){
     ## Allowing lims to be a vector if only one dimension.
     if (!is.matrix(lims)){
         lims <- matrix(lims, nrow = 1)
@@ -84,10 +84,12 @@ sim.ns <- function(pars = NULL, lims = rbind(c(0, 1), c(0, 1)), rchild = rpois, 
             plot.new()
             plot.window(xlim = lims[1, ], ylim = lims[2, ])
             box()
-            axis(1)
-            axis(2)
+            if(axis){
+                axis(1)
+                axis(2)
+            }
             points(parent.locs, pch = 4, lwd = 2, col = "red")
-            points(child.locs)
+            points(child.locs,pch=20)
         } else {
             warning("Plotting points only implemented for two dimensions.")
         }
