@@ -29,10 +29,10 @@ boot.ns <- function(fit, rchild, N, prog = TRUE){
         pb <- txtProgressBar(min = 0, max = N, style = 3)
     }
     for (i in 1:N){
-        args$points <- tryCatch(sim.ns(pars = pars[c("D", "sigma", "child.par")], lims = lims,
+        args$points <- tryCatch(sim.ns(pars = pars[c("D", "child.disp", "child.par")], lims = lims,
                               rchild = rchild),error=function(e) e)
         if(inherits(args$points,"error")) next
-        args$sigma.sv <- pars["sigma"]
+        args$child.disp.sv <- pars["child.disp"]
         args$child.dist$sv <- pars["child.par"]
         args$trace <- FALSE
         fit.boot <- tryCatch(do.call("fit.ns", args),error=function(e) e)

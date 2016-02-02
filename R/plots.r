@@ -63,9 +63,9 @@ empirical.palm <- function(points, lims, breaks = 50, xlim = NULL, add = FALSE, 
 plot.nspp <- function(x, plot.empirical = FALSE, breaks = NULL, ...){
     Dc <- x$pars["Dc"]
     nu <- x$pars["nu"]
-    sigma <- x$pars["sigma"]
+    child.disp <- x$pars["child.disp"]
     R <- x$args$R
-    analytic.palm(Dc, nu, sigma, ncol(x$args$points), c(0, R), ...)
+    analytic.palm(Dc, nu, child.disp, ncol(x$args$points), c(0, R), ...)
     if (plot.empirical){
         empirical.palm(x$args$points, x$args$lims,
                        breaks = breaks, add = TRUE)
@@ -73,9 +73,9 @@ plot.nspp <- function(x, plot.empirical = FALSE, breaks = NULL, ...){
 }
 
 ## Plots the analytic Palm intensity.
-analytic.palm <- function(Dc, nu, sigma, n.dims, xlim = c(0, 1), add = FALSE, ...){
+analytic.palm <- function(Dc, nu, child.disp, n.dims, xlim = c(0, 1),dispersion,add = FALSE, ...){
     xx <- seq(xlim[1], xlim[2], length.out = 500)
-    yy <- palm.intensity(xx, Dc, nu, sigma, n.dims)
+    yy <- palm.intensity(xx, Dc, nu, child.disp, n.dims,dispersion=dispersion)
     if (!add){
         par(xaxs = "i")
         plot.new()

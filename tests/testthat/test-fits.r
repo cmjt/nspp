@@ -43,7 +43,7 @@ test_that(
     {
         set.seed(4321)
         lims <- rbind(c(0, 100))
-        pars <- c(D = 1, sigma = 0.025, p01 = 0.2, p10 = 0.1)
+        pars <- c(D = 1, child.disp = 0.025, p01 = 0.2, p10 = 0.1)
         ## Simulating data.
         plane.data <- sim.twoplane(pars = pars, lims = lims)
         points <- plane.data$points

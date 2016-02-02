@@ -46,7 +46,7 @@ coef.nspp <- function(object, all = FALSE, ...){
 #' @method confint boot.nspp
 #'
 #' @export
-confint.boot.nspp <- function(object, parm = c("D", "sigma", "child.par"), level = 0.95, method = "percentile", ...){
+confint.boot.nspp <- function(object, parm = c("D", "child.disp", "child.par"), level = 0.95, method = "percentile", ...){
     if (is.null(parm)){
         parm <- 1:length(object$se)
     }

@@ -16,8 +16,8 @@
 #' @param lims A matrix with two columns, corresponding to the upper
 #' and lower limits of each dimension, respectively.
 #' @param R Truncation distance for the difference process.
-#' @param sigma.sv The start value for \code{sigma} in optimisation.
-#' @param sigma.bounds The bounds of the \code{sigma} parameter in
+#' @param child.disp.sv The start value for \code{child.disp} in optimisation.
+#' @param child.disp.bounds The bounds of the \code{child.disp} parameter in
 #' optimisation.
 #' @param child.dist An argument describing the distribution
 #' generating the number of children per parent. It must be a list
@@ -30,6 +30,7 @@
 #' providing the start value for the parameter to be estimated, and
 #' (4) A component named \code{bounds} providing a vector of length
 #' two that gives the parameter bounds.
+#' @param dispersion A character specifying if the dispersion of childern around parents are "gaussian" or "uniform",by deafault this is Gaussian.
 #' @param siblings A named list, containing the following three
 #' components: (1) A component named \code{matrix}, where the jth
 #' element of the ith row is \code{TRUE} if the ith and jth observed
@@ -46,10 +47,11 @@
 #' to the screen for each iteration of the optimisation procedure.
 #'
 #' @export
-fit.ns <- function(points = NULL, lims = NULL, R, sigma.sv = 0.1*R,
-                   sigma.bounds = c(0, R),
+fit.ns <- function(points = NULL, lims = NULL, R, child.disp.sv = 0.1*R,
+                   child.disp.bounds = c(0, R),
                    child.dist = list(mean = function(x) x, var = function(x) x,
                        sv = 5, bounds = c(1e-8, 1e8)),
+                   dispersion="gaussian",
                    siblings = NULL, trace = FALSE){
     ## Saving arguments.
     arg.names <- names(as.list(environment()))
@@ -98,19 +100,19 @@ fit.ns <- function(points = NULL, lims = NULL, R, sigma.sv = 0.1*R,
     n.dists <- length(dists)
     ## Sorting out start values.
     nu.sv <- nu.fun(child.dist$sv, child.dist)
-    Dc.sv <- analytic.Dc(nu.sv, sigma.sv, n.dists, n.points, R, n.dims)
+    Dc.sv <- analytic.Dc(nu.sv, child.disp.sv, n.dists, n.points, R, n.dims,dispersion=dispersion)
     if (Dc.sv <= 0){
         Dc.sv <- n.points/area
     }
-    sv <- c(Dc.sv, nu.sv, sigma.sv)
-    names(sv) <- c("Dc", "nu", "sigma")
+    sv <- c(Dc.sv, nu.sv, child.disp.sv)
+    names(sv) <- c("Dc", "nu", "child.disp")
     ## Sorting out bounds.
     Dc.bounds <- c(0, Inf)
     nu.bounds <- nu.fun(child.dist$bounds, child.dist)
     if (is.nan(nu.bounds[1])) nu.bounds[1] <- 0
     nu.bounds <- sort(nu.bounds)
-    lower <- c(Dc.bounds[1], nu.bounds[1], sigma.bounds[1])
-    upper <- c(Dc.bounds[2], nu.bounds[2], sigma.bounds[2])
+    lower <- c(Dc.bounds[1], nu.bounds[1], child.disp.bounds[1])
+    upper <- c(Dc.bounds[2], nu.bounds[2], child.disp.bounds[2])
     if (any(is.nan(log(sv)))) traceback()
     fit <-  optimx(par = log(sv), fn = ns.nll,
                    method = "L-BFGS-B",
@@ -121,18 +123,18 @@ fit.ns <- function(points = NULL, lims = NULL, R, sigma.sv = 0.1*R,
                    par.names = names(sv), siblings = v.siblings,
                    intensity.fun = intensity.fun, trace = trace)
     ## Estimation from system of partial derivatives.
-    ## fit.system <- nleqslv(c(sv["Dc"]/sv["nu"], sv["nu"], sv["sigma"),
+    ## fit.system <- nleqslv(c(sv["Dc"]/sv["nu"], sv["nu"], sv["child.disp"),
     ##                       function(x, n.points, dists, R) c(dldD(x[1], x[2], x[3], n.points, dists, R),
     ##                                                         dldnu(x[1], x[2], x[3], n.points, dists, R),
-    ##                                                         dldsigma(x[1], x[2], x[3], n.points, dists, R)),
+    ##                                                         dldchild.disp(x[1], x[2], x[3], n.points, dists, R)),
     ##                       n.points = n.points, dists = dists, R = R)
-    ## Extracting sigma and nu estimates.
+    ## Extracting child.disp and nu estimates.
     opt.pars <- exp(coef(fit)[1, ])
     names(opt.pars) <- names(sv)
-    sigma.par <- opt.pars["sigma"]
+    child.disp.par <- opt.pars["child.disp"]
     nu.par <- opt.pars["nu"]
     ## Calculating Dc estimate.
-    ##Dc.par <- analytic.Dc(nu.par, sigma.par, n.dists, n.points, R)
+    ##Dc.par <- analytic.Dc(nu.par, child.disp.par, n.dists, n.points, R)
     Dc.par <- opt.pars["Dc"]
     ## Search bounds slightly outwith optimised bounds.
     search.bounds <- child.dist$bounds
@@ -145,8 +147,8 @@ fit.ns <- function(points = NULL, lims = NULL, R, sigma.sv = 0.1*R,
     ## Calculating mu.
     mu.par <- child.dist$mean(child.par)
     D.par <- Dc.par/mu.par
-    pars <- c(D.par, sigma.par, child.par, Dc.par, mu.par, nu.par)
-    names(pars) <- c("D", "sigma", "child.par", "Dc", "mu", "nu")
+    pars <- c(D.par, child.disp.par, child.par, Dc.par, mu.par, nu.par)
+    names(pars) <- c("D", "child.disp", "child.par", "Dc", "mu", "nu")
     out <- list(pars = pars, args = args)
     class(out) <- "nspp"
     out
@@ -159,20 +161,20 @@ ns.nll <- function(pars, n.points, dists, R, d, par.names, siblings,
     pars <- exp(pars)
     Dc <- pars["Dc"]
     nu <- pars["nu"]
-    sigma <- pars["sigma"]
+    child.disp <- pars["child.disp"]
     ## Can work out Dc analytically.
-    ll1 <- sum(log(n.points*intensity.fun(dists, Dc, nu, sigma, d, siblings)))
+    ll1 <- sum(log(n.points*intensity.fun(dists, Dc, nu, child.disp, d,dispersion, siblings)))
     ## Contribution from integral.
-    ll2 <- n.points*(Dc*Vd(R, d) + nu*Fd(R, sigma, d))
+    ll2 <- n.points*(Dc*Vd(R, d) + nu*Fd(R, child.disp, d,dispersion=dispersion))
     ll <- ll1 - ll2
     ## Printing parameter values.
     if (trace){
-        cat("Dc = ", Dc, ", sigma = ", sigma, ", nu = ", nu, ", LL = ", ll, "\n", sep = "")
-        cat("Partial derivative for D: ", dldD(Dc/nu, nu, sigma, n.points, dists, R), "\n",
+        cat("Dc = ", Dc, ", child.disp = ", child.disp, ", nu = ", nu, ", LL = ", ll, "\n", sep = "")
+        cat("Partial derivative for D: ", dldD(Dc/nu, nu, child.disp, n.points, dists, R), "\n",
             sep = "")
-        cat("Partial derivative for nu: ", dldnu(Dc/nu, nu, sigma, n.points, dists, R), "\n",
+        cat("Partial derivative for nu: ", dldnu(Dc/nu, nu, child.disp, n.points, dists, R), "\n",
             sep = "")
-        cat("Partial derivative for sigma: ", dldsigma(Dc/nu, nu, sigma, n.points, dists, R),
+        cat("Partial derivative for child.disp: ", dldchild.disp(Dc/nu, nu, child.disp, n.points, dists, R),
             "\n", sep = "")
     }
     -ll
@@ -182,6 +184,7 @@ ns.nll <- function(pars, n.points, dists, R, d, par.names, siblings,
 #' @import Rcpp
 #' @importFrom mvtnorm rmvnorm
 #' @importFrom optimx optimx
+#' @importFrom gsl hyperg_2F1
 #' @useDynLib nspp
 NULL
 

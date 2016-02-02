@@ -32,14 +32,14 @@ pbc.fix <- function(points, lims){
     points
 }
 
-## Analytic value for Dc given sigma and nu.
-analytic.Dc <- function(nu, sigma, n.dists, n.points, R, d){
-    (n.dists/n.points - nu*Fd(R, sigma, d))/Vd(R, d)
+## Analytic value for Dc given child.disp and nu.
+analytic.Dc <- function(nu, child.disp, n.dists, n.points, R, d,dispersion){
+    (n.dists/n.points - nu*Fd(R, child.disp, d,dispersion))/Vd(R, d)
 }
 
-## Analytic value for nu given Dc and sigma.
-analytic.nu <- function(Dc, sigma, n.dists, n.points, R, d){
-    (n.dists/n.points - Dc*Vd(R, d))/Fd(R, sigma, d)
+## Analytic value for nu given Dc and child.disp.
+analytic.nu <- function(Dc, child.disp, n.dists, n.points, R, d,dispersion){
+    (n.dists/n.points - Dc*Vd(R, d))/Fd(R, child.disp, d,dispersion)
 }
 
 ## Surface area of d-dimensional hypersphere with radius r.
@@ -53,29 +53,38 @@ Vd <- function(r, d){
 }
 
 ## PDF of between-sibling distances.
-fd <- function(r, sigma, d){
-    2^(1 - d/2)*r^(d - 1)*exp(-r^2/(4*sigma^2))/((sigma*sqrt(2))^d*gamma(d/2))
+fd <-function(r, child.disp, d,dispersion=dispersion){
+    if (dispersion=="gaussian"){
+        2^(1 - d/2)*r^(d - 1)*exp(-r^2/(4*child.disp^2))/((child.disp*sqrt(2))^d*gamma(d/2))
+    } else if (dispersion=="uniform"){
+    (2*d)/(beta((d/2)+(1/2),1/2))*(child.disp*hyperg_2F1(1/2,(1/2)-(d/2),3/2,1)-((r/2)*hyperg_2F1(1/2,(1/2)-(d/2),3/2,r^2/(4*child.disp^2))))*((r^(d-1))/(child.disp^(d+1)))
+    }
 }
 
-## CDF of between-sibling distances.
-Fd <- function(r, sigma, d){
-    pgamma(r^2/(4*sigma^2), d/2)
+## CDF of between-sibling distances. ## hypergeometric representation for the matern case
+Fd <- function(r, child.disp, d,dispersion=dispersion){
+    if (dispersion=="gaussian"){
+        pgamma(r^2/(4*child.disp^2), d/2)
+    }else if (dispersion=="uniform"){
+        (r^d/child.disp^d) - (pbeta(r^2/(4*child.disp^2),1/2,(d/2)+(1/2))*r^d)/(child.disp^d) +( 2^d*pbeta(r^2/(4*child.disp^2),(d/2)+(1/2),(d/2)+(1/2))*beta((d/2)+(1/2),(d/2)+(1/2)))/beta(1/2,(d/2)+(1/2))
+    }
 }
 
-## Note that Dc + nu/Sd(r, d)*fd(r, sigma, d) is a correct
+## Note that Dc + nu/Sd(r, d)*fd(r, child.disp, d) is a correct
 ## formulation, but the below cancels the r^(d - 1) from both Sd(r, d)
-## and fd(r, sigma, d).
-palm.intensity <- function(r, Dc, nu, sigma, d, siblings = NULL){
-    Dc + nu/(pi^(d/2)*d/gamma(d/2 + 1))*
-        2^(1 - d/2)*exp(-r^2/(4*sigma^2))/((sigma*sqrt(2))^d*gamma(d/2))
+## and fd(r, child.disp, d)
+## note Charlotte has chaged this from hardcore version for Thomas process to be general,
+## however if dists = 0 is unstable..
+palm.intensity <- function(r, Dc, nu, child.disp, d,dispersion){
+   Dc + (nu*fd(r=r,child.disp=child.disp,d=d,dispersion=dispersion))/Sd(r=r,d=d)
 }
 
 ## Separate intensity function for known sibling information to
 ## optimise performance when there isn't any.
-palm.intensity.siblings <- function(r, Dc, nu, sigma, d, siblings){
+palm.intensity.siblings <- function(r, Dc, nu, child.disp, d, siblings){
     ns.intensity <- Dc
     s.intensity <- nu/(pi^(d/2)*d/gamma(d/2 + 1))*
-        2^(1 - d/2)*exp(-r^2/(4*sigma^2))/((sigma*sqrt(2))^d*gamma(d/2))
+        2^(1 - d/2)*exp(-r^2/(4*child.disp^2))/((child.disp*sqrt(2))^d*gamma(d/2))
     siblings$ns.multipliers*ns.intensity +
         siblings$s.multipliers*s.intensity
 }
@@ -132,17 +141,50 @@ error.dims <- function(points, lims){
 ## Functions below calculate partial derivatives for model parameters
 ## for two-dimensional processes with a Poisson distribution for the
 ## number of children.
-dldD <- function(D, nu, sigma, n.points, dists, R){
-    sum(1/(D + exp(-dists^2/(4*sigma^2))/(4*pi*sigma^2))) - n.points*pi*nu*R^2
+dldD <- function(D, nu, child.disp, n.points, dists, R){
+    sum(1/(D + exp(-dists^2/(4*child.disp^2))/(4*pi*child.disp^2))) - n.points*pi*nu*R^2
 }
 
-dldnu <- function(D, nu, sigma, n.points, dists, R){
-    length(dists)/nu - n.points*pi*D*R^2 - n.points + n.points*exp(-R^2/(4*sigma^2))
+dldnu <- function(D, nu, child.disp, n.points, dists, R){
+    length(dists)/nu - n.points*pi*D*R^2 - n.points + n.points*exp(-R^2/(4*child.disp^2))
 }
 
-dldsigma <- function(D, nu, sigma, n.points, dists, R){
-    sum((-n.points*nu*exp(-dists^2/(4*sigma^2))/(2*pi*sigma^3) +
-             n.points*nu*dists^2*exp(-dists^2/(4*sigma^2))/(8*pi*sigma^5))/
-        (n.points*D*nu + n.points*nu*exp(-dists^2/(4*sigma^2))/(4*pi*sigma^2))) +
-        n.points*nu*(R^2)*exp(-R^2/(4*sigma^2))/(2*sigma^3)
+dldchild.disp <- function(D, nu, child.disp, n.points, dists, R){
+    sum((-n.points*nu*exp(-dists^2/(4*child.disp^2))/(2*pi*child.disp^3) +
+             n.points*nu*dists^2*exp(-dists^2/(4*child.disp^2))/(8*pi*child.disp^5))/
+        (n.points*D*nu + n.points*nu*exp(-dists^2/(4*child.disp^2))/(4*pi*child.disp^2))) +
+        n.points*nu*(R^2)*exp(-R^2/(4*child.disp^2))/(2*child.disp^3)
 }
+
+
+## Charlotte's additions
+##############################
+
+## generatres uniformly distributed childern in a hypersphere
+
+unifsphere <- function(n,d,R){
+    ## n = number of points to be generated
+    ## d = dimension
+    ## R = radius of hypersphere
+    # polar coordinates
+    x <-  matrix(runif(n*d,-pi,pi),ncol=d)
+    x[,d] <- x[,d]/2
+    # cartesians
+    sin.x <- sin(x)
+    cos.x <- cos(x)
+    cos.x[,d] <- 1  
+    y <- sapply(1:d, function(i){
+        if(i==1){
+          cos.x[,1]
+        } else {
+          cos.x[,i]*apply(sin.x[,1:(i-1),drop=F],1,prod)
+        }
+    })*sqrt(runif(n,0,R^2))
+    y <-  as.data.frame(
+            t(apply(y,1,'+',rep(0,d)))
+          )
+    y
+}
+
+
+
