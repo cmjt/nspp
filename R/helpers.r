@@ -53,15 +53,19 @@ Vd <- function(r, d){
 }
 
 ## PDF of between-sibling distances.
+
 fd <-function(r, child.disp, d,dispersion=dispersion){
     if (dispersion=="gaussian"){
         2^(1 - d/2)*r^(d - 1)*exp(-r^2/(4*child.disp^2))/((child.disp*sqrt(2))^d*gamma(d/2))
     } else if (dispersion=="uniform"){
-    (2*d)/(beta((d/2)+(1/2),1/2))*(child.disp*hyperg_2F1(1/2,(1/2)-(d/2),3/2,1)-((r/2)*hyperg_2F1(1/2,(1/2)-(d/2),3/2,r^2/(4*child.disp^2))))*((r^(d-1))/(child.disp^(d+1)))
+    ((2*d)/(beta((d/2)+(1/2),1/2)))*(child.disp*hyperg_2F1(1/2,(1/2)-(d/2),3/2,1)-((r/2)*hyperg_2F1(1/2,(1/2)-(d/2),3/2,r^2/(4*child.disp^2))))*((r^(d-1))/(child.disp^(d+1)))
     }
 }
 
+
+
 ## CDF of between-sibling distances. ## hypergeometric representation for the matern case
+
 Fd <- function(r, child.disp, d,dispersion=dispersion){
     if (dispersion=="gaussian"){
         pgamma(r^2/(4*child.disp^2), d/2)
@@ -75,9 +79,9 @@ Fd <- function(r, child.disp, d,dispersion=dispersion){
 ## and fd(r, child.disp, d)
 ## note Charlotte has chaged this from hardcore version for Thomas process to be general,
 ## however if dists = 0 is unstable..
-palm.intensity <- function(r, Dc, nu, child.disp, d,dispersion){
-   Dc + (nu*fd(r=r,child.disp=child.disp,d=d,dispersion=dispersion))/Sd(r=r,d=d)
-}
+ palm.intensity <- function(r, Dc, nu, child.disp, d,dispersion=dispersion,siblings=NULL){
+     Dc + (nu*fd(r,child.disp,d,dispersion=dispersion))/Sd(r,d)
+ }
 
 ## Separate intensity function for known sibling information to
 ## optimise performance when there isn't any.

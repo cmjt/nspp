@@ -100,7 +100,7 @@ fit.ns <- function(points = NULL, lims = NULL, R, child.disp.sv = 0.1*R,
     n.dists <- length(dists)
     ## Sorting out start values.
     nu.sv <- nu.fun(child.dist$sv, child.dist)
-    Dc.sv <- analytic.Dc(nu.sv, child.disp.sv, n.dists, n.points, R, n.dims,dispersion=dispersion)
+    Dc.sv <- analytic.Dc(nu.sv, child.disp.sv, n.dists, n.points, R, n.dims,dispersion)
     if (Dc.sv <= 0){
         Dc.sv <- n.points/area
     }
@@ -112,7 +112,7 @@ fit.ns <- function(points = NULL, lims = NULL, R, child.disp.sv = 0.1*R,
     if (is.nan(nu.bounds[1])) nu.bounds[1] <- 0
     nu.bounds <- sort(nu.bounds)
     lower <- c(Dc.bounds[1], nu.bounds[1], child.disp.bounds[1])
-    upper <- c(Dc.bounds[2], nu.bounds[2], child.disp.bounds[2])
+    upper <-c(Dc.bounds[2], nu.bounds[2], child.disp.bounds[2])
     if (any(is.nan(log(sv)))) traceback()
     fit <-  optimx(par = log(sv), fn = ns.nll,
                    method = "L-BFGS-B",
@@ -155,17 +155,18 @@ fit.ns <- function(points = NULL, lims = NULL, R, child.disp.sv = 0.1*R,
 }
 
 ns.nll <- function(pars, n.points, dists, R, d, par.names, siblings,
-                   intensity.fun, trace){
+                   intensity.fun, trace, dispersion){
     ## Extracting parameters.
     names(pars) <- par.names
     pars <- exp(pars)
     Dc <- pars["Dc"]
     nu <- pars["nu"]
+    browser()
     child.disp <- pars["child.disp"]
     ## Can work out Dc analytically.
     ll1 <- sum(log(n.points*intensity.fun(dists, Dc, nu, child.disp, d,dispersion, siblings)))
     ## Contribution from integral.
-    ll2 <- n.points*(Dc*Vd(R, d) + nu*Fd(R, child.disp, d,dispersion=dispersion))
+    ll2 <- n.points*(Dc*Vd(R, d) + nu* Fd(R, child.disp, d,dispersion))
     ll <- ll1 - ll2
     ## Printing parameter values.
     if (trace){

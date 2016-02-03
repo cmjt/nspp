@@ -75,7 +75,7 @@ plot.nspp <- function(x, plot.empirical = FALSE, breaks = NULL, ...){
 ## Plots the analytic Palm intensity.
 analytic.palm <- function(Dc, nu, child.disp, n.dims, xlim = c(0, 1),dispersion,add = FALSE, ...){
     xx <- seq(xlim[1], xlim[2], length.out = 500)
-    yy <- palm.intensity(xx, Dc, nu, child.disp, n.dims,dispersion=dispersion)
+    yy <- palm.intensity(xx, Dc, nu, child.disp, n.dims,dispersion)
     if (!add){
         par(xaxs = "i")
         plot.new()

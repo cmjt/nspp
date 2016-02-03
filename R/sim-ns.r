@@ -75,9 +75,9 @@ sim.ns <- function(pars = NULL, lims = rbind(c(0, 1), c(0, 1)), rchild = rpois, 
     }
     if(dispersion=="gaussian"){
         ## Generating children dispersion from parent.
-        child.disp <- rmvnorm(n = n.children, mean = rep(0, n.dims),
+        child.disper <- rmvnorm(n = n.children, mean = rep(0, n.dims),
                               sigma = child.disp^2*diag(n.dims))
-        child.locs <- matrix(rep(parent.locs, times = rep(n.childs, n.dims)), ncol = n.dims) + child.disp
+        child.locs <- matrix(rep(parent.locs, times = rep(n.childs, n.dims)), ncol = n.dims) + child.disper
     }else if (dispersion=="uniform"){
          ## Generating children uniformly around parents in a hypersphere
          childs<-as.matrix(unifsphere(n=n.children,d=n.dims,R=child.disp))
@@ -92,6 +92,7 @@ sim.ns <- function(pars = NULL, lims = rbind(c(0, 1), c(0, 1)), rchild = rpois, 
             plot.window(xlim = lims[1, ], ylim = lims[2, ])
             points(parent.locs, pch = 4, lwd = 2, col = "grey")
             points(child.locs,pch=20)
+            box()
         } else {
             warning("Plotting points only implemented for two dimensions.")
         }
