@@ -165,9 +165,7 @@ ns.nll <- function(pars, n.points, dists, R, d, par.names, siblings,
     nu <- pars["nu"]
     child.disp <- pars["child.disp"]
     ## Can work out Dc analytically.
-    int<-intensity.fun(dists, Dc, nu, child.disp, d,dispersion, siblings)
-    int<-int[!is.nan(int)]
-    ll1 <- sum(log(n.points*int))
+    ll1 <- sum(log(n.points*intensity.fun(dists, Dc, nu, child.disp, d,dispersion, siblings)))
     ## Contribution from integral.
     ll2 <- n.points*(Dc*Vd(R, d) + nu* Fd(R, child.disp, d,dispersion))
     ll <- ll1 - ll2

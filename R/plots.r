@@ -85,5 +85,5 @@ analytic.palm <- function(Dc, nu, child.disp, n.dims, xlim = c(0, 1),dispersion,
         axis(1)
         axis(2)
     }
-    lines(xx, yy, ...)
+    lines(xx, yy, col=2,...)
 }

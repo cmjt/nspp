@@ -58,7 +58,8 @@ fd <-function(r, child.disp, d,dispersion=dispersion){
     if (dispersion=="gaussian"){
         2^(1 - d/2)*r^(d - 1)*exp(-r^2/(4*child.disp^2))/((child.disp*sqrt(2))^d*gamma(d/2))
     } else if (dispersion=="uniform"){
-    ((2*d)/(beta((d/2)+(1/2),1/2)))*(child.disp*hyperg_2F1(1/2,(1/2)-(d/2),3/2,1)-((r/2)*hyperg_2F1(1/2,(1/2)-(d/2),3/2,r^2/(4*child.disp^2))))*((r^(d-1))/(child.disp^(d+1)))
+        ifelse(r>=2*child.disp,0,
+    ((2*d)/(beta((d/2)+(1/2),1/2)))*(child.disp*hyperg_2F1(1/2,(1/2)-(d/2),3/2,1)-((r/2)*hyperg_2F1(1/2,(1/2)-(d/2),3/2,r^2/(4*child.disp^2))))*((r^(d-1))/(child.disp^(d+1))))
     }
 }
 
