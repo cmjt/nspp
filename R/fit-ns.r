@@ -54,7 +54,6 @@ fit.ns <- function(points = NULL, lims = NULL, R, child.disp.sv = 0.1*R,
                    dispersion="gaussian",
                    siblings = NULL, trace = FALSE){
     ## Saving arguments.
-    dispersion=dispersion
     arg.names <- names(as.list(environment()))
     args <- vector(mode = "list", length = length(arg.names))
     names(args) <- arg.names
@@ -76,9 +75,11 @@ fit.ns <- function(points = NULL, lims = NULL, R, child.disp.sv = 0.1*R,
     n.dims <- nrow(lims)
     ## Vectorising siblings matrix, and setting intensity function.
     if (!is.null(siblings)){
+        dispersion<-"gaussian"
         v.siblings <- vectorise.siblings(siblings)
         intensity.fun <- palm.intensity.siblings
     } else {
+        dispersion=dispersion
         v.siblings <- NULL
         intensity.fun <- palm.intensity
     }

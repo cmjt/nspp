@@ -85,7 +85,7 @@ Fd <- function(r, child.disp, d,dispersion=dispersion){
 
 ## Separate intensity function for known sibling information to
 ## optimise performance when there isn't any.
-palm.intensity.siblings <- function(r, Dc, nu, child.disp, d, siblings){
+palm.intensity.siblings <- function(r, Dc, nu, child.disp, d, dispersion,siblings){
     ns.intensity <- Dc
     s.intensity <- nu/(pi^(d/2)*d/gamma(d/2 + 1))*
         2^(1 - d/2)*exp(-r^2/(4*child.disp^2))/((child.disp*sqrt(2))^d*gamma(d/2))
