@@ -54,6 +54,7 @@ fit.ns <- function(points = NULL, lims = NULL, R, child.disp.sv = 0.1*R,
                    dispersion="gaussian",
                    siblings = NULL, trace = FALSE){
     ## Saving arguments.
+    dispersion=dispersion
     arg.names <- names(as.list(environment()))
     args <- vector(mode = "list", length = length(arg.names))
     names(args) <- arg.names
@@ -121,7 +122,7 @@ fit.ns <- function(points = NULL, lims = NULL, R, child.disp.sv = 0.1*R,
                    n.points = n.points, dists = dists, R = R,
                    d = n.dims,
                    par.names = names(sv), siblings = v.siblings,
-                   intensity.fun = intensity.fun, trace = trace)
+                   intensity.fun = intensity.fun, trace = trace,dispersion=dispersion)
     ## Estimation from system of partial derivatives.
     ## fit.system <- nleqslv(c(sv["Dc"]/sv["nu"], sv["nu"], sv["child.disp"),
     ##                       function(x, n.points, dists, R) c(dldD(x[1], x[2], x[3], n.points, dists, R),
@@ -156,15 +157,16 @@ fit.ns <- function(points = NULL, lims = NULL, R, child.disp.sv = 0.1*R,
 
 ns.nll <- function(pars, n.points, dists, R, d, par.names, siblings,
                    intensity.fun, trace, dispersion){
-    ## Extracting parameters.
+    ## Extracting parameters
     names(pars) <- par.names
     pars <- exp(pars)
     Dc <- pars["Dc"]
     nu <- pars["nu"]
-    browser()
     child.disp <- pars["child.disp"]
     ## Can work out Dc analytically.
-    ll1 <- sum(log(n.points*intensity.fun(dists, Dc, nu, child.disp, d,dispersion, siblings)))
+    int<-intensity.fun(dists, Dc, nu, child.disp, d,dispersion, siblings)
+    int<-int[!is.nan(int)]
+    ll1 <- sum(log(n.points*int))
     ## Contribution from integral.
     ll2 <- n.points*(Dc*Vd(R, d) + nu* Fd(R, child.disp, d,dispersion))
     ll <- ll1 - ll2
