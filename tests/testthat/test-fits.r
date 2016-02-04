@@ -43,7 +43,7 @@ test_that(
         fit.mat.pois.2D <- fit.ns(points = example.mat.2D, lims = rbind(c(0, 1), c(0, 1)), R = 0.5,
                                   dispersion="uniform",
                               child.dist = list(mean = function(x) x, var = function(x) x,
-                                  sv = 20, bounds = c(1e-6, nrow(example.2D))))
+                                  sv = 20, bounds = c(1e-6, nrow(example.mat.2D))))
         expect_that(abs(coef(fit.mat.pois.2D)[1] - 5.095349) < 1e-4, is_true())
     })
 
