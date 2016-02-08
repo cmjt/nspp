@@ -75,9 +75,11 @@ fit.ns <- function(points = NULL, lims = NULL, R, child.disp.sv = 0.1*R,
     n.dims <- nrow(lims)
     ## Vectorising siblings matrix, and setting intensity function.
     if (!is.null(siblings)){
+        dispersion<-"gaussian"
         v.siblings <- vectorise.siblings(siblings)
         intensity.fun <- palm.intensity.siblings
     } else {
+        dispersion=dispersion
         v.siblings <- NULL
         intensity.fun <- palm.intensity
     }
@@ -100,7 +102,7 @@ fit.ns <- function(points = NULL, lims = NULL, R, child.disp.sv = 0.1*R,
     n.dists <- length(dists)
     ## Sorting out start values.
     nu.sv <- nu.fun(child.dist$sv, child.dist)
-    Dc.sv <- analytic.Dc(nu.sv, child.disp.sv, n.dists, n.points, R, n.dims,dispersion=dispersion)
+    Dc.sv <- analytic.Dc(nu.sv, child.disp.sv, n.dists, n.points, R, n.dims,dispersion)
     if (Dc.sv <= 0){
         Dc.sv <- n.points/area
     }
@@ -112,7 +114,7 @@ fit.ns <- function(points = NULL, lims = NULL, R, child.disp.sv = 0.1*R,
     if (is.nan(nu.bounds[1])) nu.bounds[1] <- 0
     nu.bounds <- sort(nu.bounds)
     lower <- c(Dc.bounds[1], nu.bounds[1], child.disp.bounds[1])
-    upper <- c(Dc.bounds[2], nu.bounds[2], child.disp.bounds[2])
+    upper <-c(Dc.bounds[2], nu.bounds[2], child.disp.bounds[2])
     if (any(is.nan(log(sv)))) traceback()
     fit <-  optimx(par = log(sv), fn = ns.nll,
                    method = "L-BFGS-B",
@@ -121,7 +123,7 @@ fit.ns <- function(points = NULL, lims = NULL, R, child.disp.sv = 0.1*R,
                    n.points = n.points, dists = dists, R = R,
                    d = n.dims,
                    par.names = names(sv), siblings = v.siblings,
-                   intensity.fun = intensity.fun, trace = trace)
+                   intensity.fun = intensity.fun, trace = trace,dispersion=dispersion)
     ## Estimation from system of partial derivatives.
     ## fit.system <- nleqslv(c(sv["Dc"]/sv["nu"], sv["nu"], sv["child.disp"),
     ##                       function(x, n.points, dists, R) c(dldD(x[1], x[2], x[3], n.points, dists, R),
@@ -155,8 +157,8 @@ fit.ns <- function(points = NULL, lims = NULL, R, child.disp.sv = 0.1*R,
 }
 
 ns.nll <- function(pars, n.points, dists, R, d, par.names, siblings,
-                   intensity.fun, trace){
-    ## Extracting parameters.
+                   intensity.fun, trace, dispersion){
+    ## Extracting parameters
     names(pars) <- par.names
     pars <- exp(pars)
     Dc <- pars["Dc"]
@@ -165,7 +167,7 @@ ns.nll <- function(pars, n.points, dists, R, d, par.names, siblings,
     ## Can work out Dc analytically.
     ll1 <- sum(log(n.points*intensity.fun(dists, Dc, nu, child.disp, d,dispersion, siblings)))
     ## Contribution from integral.
-    ll2 <- n.points*(Dc*Vd(R, d) + nu*Fd(R, child.disp, d,dispersion=dispersion))
+    ll2 <- n.points*(Dc*Vd(R, d) + nu* Fd(R, child.disp, d,dispersion))
     ll <- ll1 - ll2
     ## Printing parameter values.
     if (trace){
@@ -210,6 +212,17 @@ NULL
 #' @name example.2D
 #' @format A matrix.
 #' @usage example.2D
+#' @docType data
+#' @keywords datasets
+NULL
+
+#' 2-dimensional matern example data
+#'
+#' Simulated data, with children points generated from a Poisson(10)
+#'
+#' @name example.mat.2D
+#' @format A matrix.
+#' @usage example.mat.2D
 #' @docType data
 #' @keywords datasets
 NULL

@@ -4,7 +4,7 @@
 \alias{confint.boot.nspp}
 \title{Extracts Neyman-Scott point process parameter confidence intervals.}
 \usage{
-\method{confint}{boot.nspp}(object, parm = c("D", "sigma", "child.par"),
+\method{confint}{boot.nspp}(object, parm = c("D", "child.disp", "child.par"),
   level = 0.95, method = "percentile", ...)
 }
 \arguments{
