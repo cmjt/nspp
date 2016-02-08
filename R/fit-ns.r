@@ -215,3 +215,14 @@ NULL
 #' @docType data
 #' @keywords datasets
 NULL
+
+#' 2-dimensional matern example data
+#'
+#' Simulated data, with children points generated from a Poisson(10)
+#'
+#' @name example.mat.2D
+#' @format A matrix.
+#' @usage example.mat.2D
+#' @docType data
+#' @keywords datasets
+NULL
