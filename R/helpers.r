@@ -79,9 +79,16 @@ Fd <- function(r, child.disp, d,dispersion=dispersion){
 ## formulation, but the below cancels the r^(d - 1) from both Sd(r, d)
 ## and fd(r, child.disp, d)
 ## note Charlotte has chaged this from hardcore version for Thomas process to be general,
-## however if dists = 0 is unstable..
+## however if dists = 0 is unstable.. Bugger should change to hardcore version--have done
  palm.intensity <- function(r, Dc, nu, child.disp, d,dispersion=dispersion,siblings=NULL){
-     Dc + (nu*fd(r,child.disp,d,dispersion=dispersion))/Sd(r,d)
+     if(dispersion=="gaussian"){
+         Dc + nu/(pi^(d/2)*d/gamma(d/2 + 1))*
+        2^(1 - d/2)*exp(-r^2/(4*child.disp^2))/((child.disp*sqrt(2))^d*gamma(d/2))
+     } else if (dispersion=="uniform"){
+         ifelse(r<=2*child.disp,
+      Dc + ((2*nu)/(child.disp^(d+1)))*((gamma(d/2 +1))/(pi^(d/2 + 0.5)))*(child.disp*hyperg_2F1(1/2,(1/2)-(d/2),3/2,1)-((r/2)*hyperg_2F1(1/2,(1/2)-(d/2),3/2,r^2/(4*child.disp^2)))),Dc)
+         
+     }
  }
 
 ## Separate intensity function for known sibling information to
