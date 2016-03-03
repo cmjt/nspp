@@ -4,10 +4,10 @@
 \alias{fit.ns}
 \title{Fitting a model to a Neyman-Scott point process}
 \usage{
-fit.ns(points = NULL, lims = NULL, R, sigma.sv = 0.1 * R,
-  sigma.bounds = c(0, R), child.dist = list(mean = function(x) x, var =
-  function(x) x, sv = 5, bounds = c(1e-08, 1e+08)), siblings = NULL,
-  trace = FALSE)
+fit.ns(points = NULL, lims = NULL, R, child.disp.sv = 0.1 * R,
+  child.disp.bounds = c(0, R), child.dist = list(mean = function(x) x, var =
+  function(x) x, sv = 5, bounds = c(1e-08, 1e+08)), dispersion = "gaussian",
+  siblings = NULL, trace = FALSE)
 }
 \arguments{
 \item{points}{A matrix containing locations of observed points,
@@ -19,9 +19,9 @@ and lower limits of each dimension, respectively.}
 
 \item{R}{Truncation distance for the difference process.}
 
-\item{sigma.sv}{The start value for \code{sigma} in optimisation.}
+\item{child.disp.sv}{The start value for \code{child.disp} in optimisation.}
 
-\item{sigma.bounds}{The bounds of the \code{sigma} parameter in
+\item{child.disp.bounds}{The bounds of the \code{child.disp} parameter in
 optimisation.}
 
 \item{child.dist}{An argument describing the distribution
@@ -35,6 +35,8 @@ single parameter to be estimated, (3) A component named \code{sv}
 providing the start value for the parameter to be estimated, and
 (4) A component named \code{bounds} providing a vector of length
 two that gives the parameter bounds.}
+
+\item{dispersion}{A character specifying if the dispersion of childern around parents are "gaussian" or "uniform",by deafault this is Gaussian.}
 
 \item{siblings}{A named list, containing the following three
 components: (1) A component named \code{matrix}, where the jth

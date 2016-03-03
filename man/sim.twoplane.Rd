@@ -8,7 +8,7 @@ sim.twoplane(pars, lims)
 }
 \arguments{
 \item{pars}{A named vector of parameter values. Required parameters
-are \code{D}, whale density, \code{sigma}, whale movement,
+are \code{D}, whale density, \code{child.disp}, whale movement,
 \code{p01}, the probability that a whale is on the surface when the
 second plane flies over, given that it was submerged when the first
 plane flew over, and \code{10}, the probability that a whale is
