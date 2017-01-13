@@ -184,7 +184,7 @@ unifsphere <- function(n,d,R){
     # cartesians
     sin.x <- sin(x)
     cos.x <- cos(x)
-    cos.x[,d] <- 1  
+    cos.x[,d] <- 1
     y <- sapply(1:d, function(i){
         if(i==1){
           cos.x[,1]
@@ -192,6 +192,7 @@ unifsphere <- function(n,d,R){
           cos.x[,i]*apply(sin.x[,1:(i-1),drop=F],1,prod)
         }
     })*sqrt(runif(n,0,R^2))
+    if(n==1){y <- matrix(y,ncol = d)}
     y <-  as.data.frame(
             t(apply(y,1,'+',rep(0,d)))
           )
