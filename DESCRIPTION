@@ -20,4 +20,4 @@ Description: This package provides functions for the simulation and parameter
 License: GPL
 URL: https://github.com/b-steve/nspp
 LazyData: TRUE
-RoxygenNote: 5.0.0
+RoxygenNote: 6.0.1
