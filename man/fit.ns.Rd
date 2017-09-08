@@ -67,4 +67,3 @@ Tanaka, U., Ogata, Y., and Stoyan, D. (2008) Parameter
 estimation and model selection for Neyman-Scott point
 processes. \emph{Biometrical Journal}, \strong{50}: 43--57.
 }
-

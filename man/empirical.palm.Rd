@@ -30,4 +30,3 @@ A plot showing the empirical Palm intensity.
 \description{
 Plots the Palm intensity from empirical data.
 }
-

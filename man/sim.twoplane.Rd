@@ -25,4 +25,3 @@ plane IDs.
 Simulates observed whale locations and plane IDs from a two-plane
 whale survey.
 }
-

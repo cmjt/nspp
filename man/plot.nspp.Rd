@@ -21,4 +21,3 @@ Palm intensity is also plotted.}
 Plots a fitted Palm intensity function from an object returned by
 \link{fit.ns}().
 }
-

@@ -30,4 +30,3 @@ bootstrap procedure.
 Carries out a bootstrap for Neymann-Scott point process models
 fitted by \link{fit.ns}().
 }
-

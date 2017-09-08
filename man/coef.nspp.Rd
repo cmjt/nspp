@@ -18,4 +18,3 @@ included.}
 Extracts estimated and derived parameters from a model fitted using
 \link{fit.ns}.
 }
-
