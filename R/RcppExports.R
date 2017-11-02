@@ -7,6 +7,6 @@
 #'
 #' @inheritParams fit.ns
 pbc_distances <- function(points, lims) {
-    .Call('nspp_pbc_distances', PACKAGE = 'nspp', points, lims)
+    .Call('_nspp_pbc_distances', PACKAGE = 'nspp', points, lims)
 }
 

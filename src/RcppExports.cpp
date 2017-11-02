@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // pbc_distances
 NumericVector pbc_distances(const NumericMatrix& points, const NumericMatrix& lims);
-RcppExport SEXP nspp_pbc_distances(SEXP pointsSEXP, SEXP limsSEXP) {
+RcppExport SEXP _nspp_pbc_distances(SEXP pointsSEXP, SEXP limsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -16,4 +16,14 @@ BEGIN_RCPP
     rcpp_result_gen = Rcpp::wrap(pbc_distances(points, lims));
     return rcpp_result_gen;
 END_RCPP
+}
+
+static const R_CallMethodDef CallEntries[] = {
+    {"_nspp_pbc_distances", (DL_FUNC) &_nspp_pbc_distances, 2},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_nspp(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
 }
