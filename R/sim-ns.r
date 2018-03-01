@@ -90,7 +90,7 @@ sim.ns <- function(pars = NULL, lims = rbind(c(0, 1), c(0, 1)), rchild = rpois, 
         if (n.dims == 2){
             plot.new()
             plot.window(xlim = lims[1, ], ylim = lims[2, ])
-            points(parent.locs, pch = 4, lwd = 2, col = "grey")
+            points(parent.locs, pch = 4, lwd = 2, col = "red")
             points(child.locs,pch=20)
             box()
         } else {
