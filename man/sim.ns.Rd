@@ -59,3 +59,4 @@ example, if a Binomial(n, 2, p) is required, then \code{function(n,
 p) rbinom(n = n, size = 2, prob = p)} would be an appropriate
 function for \code{rchild}.
 }
+

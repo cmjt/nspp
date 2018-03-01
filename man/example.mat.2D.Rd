@@ -12,3 +12,4 @@ example.mat.2D
 Simulated data, with children points generated from a Poisson(10)
 }
 \keyword{datasets}
+

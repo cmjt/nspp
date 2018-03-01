@@ -17,3 +17,4 @@ and lower limits of each dimension, respectively.}
 \description{
 Calculates pairwise distances between points subject to periodic boundary constraints.
 }
+

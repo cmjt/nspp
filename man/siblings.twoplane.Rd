@@ -20,3 +20,4 @@ Creates an object suitable for the \code{siblings} argument to
 partial sibling information in that observations made by the same
 plane cannot be siblings.
 }
+
